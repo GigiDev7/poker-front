@@ -67,6 +67,7 @@ const Tables = () => {
             {modalType === "join" && (
               <div className="w-full">
                 <input
+                  value={tableId ?? ""}
                   onChange={(e) => setTableId(e.target.value)}
                   placeholder="Table id"
                   className="border-[1px] border-black p-2 w-full"
