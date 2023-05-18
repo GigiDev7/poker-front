@@ -32,15 +32,21 @@ const GameTable: React.FC<{ tableData: ITableData }> = ({ tableData }) => {
             <Card card={player.cards[0]} />
             <Card card={player.cards[1]} />
           </div>
-          <Player playerData={player} />
+          <Player
+            playerData={player}
+            isTurn={tableData.playerTurn === player.id}
+          />
         </div>
         <div className="flex gap-1 absolute">
           {tableData.cards.map((c) => (
-            <Card card={c} />
+            <Card key={c} card={c} />
           ))}
         </div>
         <div className="absolute -top-10 flex flex-col items-center gap-4">
-          <Player playerData={oponent} />
+          <Player
+            isTurn={tableData.playerTurn === oponent.id}
+            playerData={oponent}
+          />
           <div className="flex gap-2">
             <Card card={oponent.cards[0]} back />
             <Card card={oponent.cards[1]} back />
