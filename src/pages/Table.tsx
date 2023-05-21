@@ -25,7 +25,6 @@ const Table = () => {
       socket.emit("join", cookies.user, params.tableId);
     });
     socket.on("table-data", (table) => {
-      console.log("s");
       setTableData(table);
     });
 

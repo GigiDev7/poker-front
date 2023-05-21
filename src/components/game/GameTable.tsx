@@ -16,6 +16,14 @@ const GameTable: React.FC<{
     handleAction("fold");
   };
 
+  const onAllin = () => {
+    handleAction("all-in");
+  };
+
+  const onCall = () => {
+    handleAction("call");
+  };
+
   const player = useMemo(
     () =>
       tableData.player1.email === user.email
@@ -79,21 +87,34 @@ const GameTable: React.FC<{
       </div>
       {tableData.playerTurn === player.id && (
         <div className="mt-16 bg-white h-20 rounded-md flex justify-between items-center px-5">
-          <button className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600">
+          <button
+            onClick={onCall}
+            className="bg-gray-500 disabled:bg-gray-300 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+          >
             Call
           </button>
-          <button className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600">
+          <button
+            disabled={tableData.lastAction === "all-in"}
+            className="bg-gray-500 disabled:bg-gray-300 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+          >
             Check
           </button>
-          <button className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600">
+          <button
+            disabled={tableData.lastAction === "all-in"}
+            className="bg-gray-500 disabled:bg-gray-300 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+          >
             Raise
           </button>
-          <button className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600">
+          <button
+            disabled={tableData.lastAction === "all-in"}
+            onClick={onAllin}
+            className="bg-gray-500 disabled:bg-gray-300 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+          >
             All in
           </button>
           <button
             onClick={onFold}
-            className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+            className="bg-gray-500 disabled:bg-gray-300 text-white px-6 py-2 rounded-md hover:bg-gray-600"
           >
             Fold
           </button>

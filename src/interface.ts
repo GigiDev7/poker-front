@@ -17,8 +17,11 @@ export interface IPlayer {
 
 export interface ITableData {
   pot: number;
+  lastAction: string;
   smallBlind: number;
   bigBlind: number;
+  gameIsFinished: boolean;
+  winner: string;
   playerTurn: string;
   cards: string[];
   tableId: string;
