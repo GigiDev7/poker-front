@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState, useRef } from "react";
 import Player from "./Player";
 import Card from "./Card";
 import { BiCoinStack } from "react-icons/bi";
 import { ITableData } from "../../interface";
 import { useCookies } from "react-cookie";
-import { Modal } from "antd";
+import { Modal, InputNumber } from "antd";
+import { GiConfirmed, GiCancel } from "react-icons/gi";
 
 const GameTable: React.FC<{
   tableData: ITableData;
@@ -13,6 +14,25 @@ const GameTable: React.FC<{
 }> = ({ tableData, handleAction, finishedHand }) => {
   const [cookies] = useCookies();
   const user = cookies.user;
+
+  const player = useMemo(
+    () =>
+      tableData.player1.email === user.email
+        ? tableData.player1
+        : tableData.player2,
+    [tableData]
+  );
+  const oponent = useMemo(
+    () =>
+      tableData.player1.email !== user.email
+        ? tableData.player1
+        : tableData.player2,
+    [tableData]
+  );
+
+  const [activeRaise, setActiveRaise] = useState(false);
+  const [raiseChips, setRaiseChips] = useState<number | null>(null);
+  const [chipsValid, setChipsValid] = useState(true);
 
   const onFold = () => {
     handleAction("fold");
@@ -30,22 +50,41 @@ const GameTable: React.FC<{
     handleAction("check");
   };
 
-  const onRaise = () => {};
+  const onRaise = () => {
+    if (raiseChips && chipsValid) {
+      setActiveRaise(false);
+      handleAction("raise", raiseChips);
+      setRaiseChips(null);
+      setChipsValid(true);
+    }
+  };
 
-  const player = useMemo(
-    () =>
-      tableData.player1.email === user.email
-        ? tableData.player1
-        : tableData.player2,
-    [tableData]
-  );
-  const oponent = useMemo(
-    () =>
-      tableData.player1.email !== user.email
-        ? tableData.player1
-        : tableData.player2,
-    [tableData]
-  );
+  const onChipsChange = (val: number | null) => {
+    setRaiseChips(val);
+    if (
+      val &&
+      (val < oponent.action.actionChips + player.action.actionChips ||
+        val > player.chipCount)
+    ) {
+      setChipsValid(false);
+    } else if (val) {
+      setChipsValid(true);
+    }
+  };
+
+  const onRaiseBtnClick = () => {
+    setActiveRaise(true);
+  };
+
+  const hideActiveRaise = () => {
+    setActiveRaise(false);
+    setRaiseChips(null);
+    setChipsValid(true);
+  };
+
+  const closeGame = () => {
+    window.close();
+  };
 
   return (
     <div className="flex flex-col">
@@ -116,12 +155,34 @@ const GameTable: React.FC<{
           >
             Check
           </button>
-          <button
-            disabled={tableData.lastAction === "all-in"}
-            className="bg-gray-500 disabled:bg-gray-300 text-white px-6 py-2 rounded-md hover:bg-gray-600"
-          >
-            Raise
-          </button>
+          {!activeRaise ? (
+            <button
+              onClick={onRaiseBtnClick}
+              disabled={tableData.lastAction === "all-in"}
+              className="bg-gray-500 disabled:bg-gray-300 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+            >
+              Raise
+            </button>
+          ) : (
+            <div className="relative">
+              <InputNumber
+                value={raiseChips}
+                size="large"
+                className="w-32"
+                onChange={(val) => onChipsChange(val)}
+                status={!chipsValid ? "error" : ""}
+                controls={false}
+              />
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 flex gap-2 mr-1 text-xl">
+                <button onClick={onRaise} className="text-green-500">
+                  <GiConfirmed />
+                </button>
+                <button onClick={hideActiveRaise} className="text-red-500">
+                  <GiCancel />
+                </button>
+              </div>
+            </div>
+          )}
           <button
             disabled={tableData.lastAction === "all-in"}
             onClick={onAllin}
@@ -138,8 +199,14 @@ const GameTable: React.FC<{
         </div>
       )}
 
-      <Modal open={!!tableData.winner}>
-        <p>Winner</p>
+      <Modal onCancel={closeGame} footer={null} open={!!tableData.winner}>
+        <div className="flex justify-center m-4">
+          <p className="capitalize font-semibold">
+            {tableData.winner === player.id
+              ? `${player.firstname} ${player.lastname} won!`
+              : `${oponent.firstname} ${oponent.lastname} won!`}
+          </p>
+        </div>
       </Modal>
     </div>
   );
