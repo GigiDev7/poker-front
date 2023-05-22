@@ -9,7 +9,7 @@ import Table from "./pages/Table";
 //import Cookies from "js-cookie";
 
 function App() {
-  const [cookies, setCookies] = useCookies();
+  const [cookies] = useCookies();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
