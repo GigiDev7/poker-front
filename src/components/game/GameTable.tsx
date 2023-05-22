@@ -4,11 +4,13 @@ import Card from "./Card";
 import { BiCoinStack } from "react-icons/bi";
 import { ITableData } from "../../interface";
 import { useCookies } from "react-cookie";
+import { Modal } from "antd";
 
 const GameTable: React.FC<{
   tableData: ITableData;
   handleAction: (action: string, chips?: number) => void;
-}> = ({ tableData, handleAction }) => {
+  finishedHand: boolean;
+}> = ({ tableData, handleAction, finishedHand }) => {
   const [cookies] = useCookies();
   const user = cookies.user;
 
@@ -23,6 +25,12 @@ const GameTable: React.FC<{
   const onCall = () => {
     handleAction("call");
   };
+
+  const onCheck = () => {
+    handleAction("check");
+  };
+
+  const onRaise = () => {};
 
   const player = useMemo(
     () =>
@@ -47,12 +55,14 @@ const GameTable: React.FC<{
           <div className="flex gap-2 relative">
             <Card card={player.cards[0]} />
             <Card card={player.cards[1]} />
-            <div className="absolute -bottom-10 -left-8 text-white gap-1 flex items-center">
-              <p>{player.action.actionChips}</p>
-              <p>
-                <BiCoinStack />
-              </p>
-            </div>
+            {player.action.actionChips > 0 && (
+              <div className="absolute -bottom-10 -left-8 text-white gap-1 flex items-center">
+                <p>{player.action.actionChips}</p>
+                <p>
+                  <BiCoinStack />
+                </p>
+              </div>
+            )}
           </div>
           <Player
             playerData={player}
@@ -74,27 +84,34 @@ const GameTable: React.FC<{
             playerData={oponent}
           />
           <div className="flex gap-2 relative">
-            <Card card={oponent.cards[0]} back />
-            <Card card={oponent.cards[1]} back />
-            <div className="absolute -top-10 -left-8 text-white gap-1 flex items-center">
-              <p>{oponent.action.actionChips}</p>
-              <p>
-                <BiCoinStack />
-              </p>
-            </div>
+            <Card card={oponent.cards[0]} back={!finishedHand} />
+            <Card card={oponent.cards[1]} back={!finishedHand} />
+            {oponent.action.actionChips > 0 && (
+              <div className="absolute -top-10 -left-8 text-white gap-1 flex items-center">
+                <p>{oponent.action.actionChips}</p>
+                <p>
+                  <BiCoinStack />
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      {tableData.playerTurn === player.id && (
+      {tableData.playerTurn === player.id && !finishedHand && (
         <div className="mt-16 bg-white h-20 rounded-md flex justify-between items-center px-5">
           <button
+            disabled={tableData.lastAction === "check"}
             onClick={onCall}
             className="bg-gray-500 disabled:bg-gray-300 text-white px-6 py-2 rounded-md hover:bg-gray-600"
           >
             Call
           </button>
           <button
-            disabled={tableData.lastAction === "all-in"}
+            onClick={onCheck}
+            disabled={
+              tableData.player1.action.actionChips !==
+              tableData.player2.action.actionChips
+            }
             className="bg-gray-500 disabled:bg-gray-300 text-white px-6 py-2 rounded-md hover:bg-gray-600"
           >
             Check
@@ -120,6 +137,10 @@ const GameTable: React.FC<{
           </button>
         </div>
       )}
+
+      <Modal open={!!tableData.winner}>
+        <p>Winner</p>
+      </Modal>
     </div>
   );
 };

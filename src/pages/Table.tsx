@@ -12,6 +12,7 @@ const Table = () => {
   const params = useParams();
 
   const [tableData, setTableData] = useState<null | ITableData>(null);
+  const [finishedHand, setFinishedHand] = useState(false);
 
   const handleAction = (action: string, chips?: number) => {
     const actionData: { action: string; chips?: number } = { action };
@@ -25,7 +26,11 @@ const Table = () => {
       socket.emit("join", cookies.user, params.tableId);
     });
     socket.on("table-data", (table) => {
+      setFinishedHand(false);
       setTableData(table);
+    });
+    socket.on("finished-hand", () => {
+      setFinishedHand(true);
     });
 
     return () => {
@@ -36,7 +41,11 @@ const Table = () => {
   return (
     <div className="bg-black h-full flex justify-center items-center">
       {tableData && (
-        <GameTable handleAction={handleAction} tableData={tableData} />
+        <GameTable
+          handleAction={handleAction}
+          tableData={tableData}
+          finishedHand={finishedHand}
+        />
       )}
     </div>
   );
