@@ -6,7 +6,10 @@ import { useParams } from "react-router-dom";
 import { ITableData } from "../interface";
 import { BASE_URL_PROD } from "../config";
 
-const socket = io(`${BASE_URL_PROD}`, { autoConnect: false });
+const socket = io(`${BASE_URL_PROD}`, {
+  autoConnect: false,
+  transports: ["websocket"],
+});
 
 const Table = () => {
   const [cookies] = useCookies();
