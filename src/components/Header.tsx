@@ -36,6 +36,8 @@ const Header = () => {
   const onLogout = async () => {
     await authAPI.logout();
     removeCookie("user");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
     profileWindow.hideModal();
     dispatch(authAction.setUser(null));
   };

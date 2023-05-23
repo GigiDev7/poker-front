@@ -3,7 +3,7 @@ import Player from "./Player";
 import Card from "./Card";
 import { BiCoinStack } from "react-icons/bi";
 import { ITableData } from "../../interface";
-import { useCookies } from "react-cookie";
+//import { useCookies } from "react-cookie";
 import { Modal, InputNumber } from "antd";
 import { GiConfirmed, GiCancel } from "react-icons/gi";
 
@@ -12,8 +12,8 @@ const GameTable: React.FC<{
   handleAction: (action: string, chips?: number) => void;
   finishedHand: boolean;
 }> = ({ tableData, handleAction, finishedHand }) => {
-  const [cookies] = useCookies();
-  const user = cookies.user;
+  //const [cookies] = useCookies();
+  const user = JSON.parse(localStorage.getItem("user")!);
 
   const player = useMemo(
     () =>

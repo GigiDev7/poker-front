@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import GameTable from "../components/game/GameTable";
 import { io } from "socket.io-client";
-import { useCookies } from "react-cookie";
+//import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
 import { ITableData } from "../interface";
 import { BASE_URL_PROD } from "../config";
@@ -12,8 +12,10 @@ const socket = io(`${BASE_URL_PROD}`, {
 });
 
 const Table = () => {
-  const [cookies] = useCookies();
+  //const [cookies] = useCookies();
   const params = useParams();
+
+  const user = JSON.parse(localStorage.getItem("user")!);
 
   const [tableData, setTableData] = useState<null | ITableData>(null);
   const [finishedHand, setFinishedHand] = useState(false);
@@ -27,7 +29,7 @@ const Table = () => {
   useEffect(() => {
     socket.connect();
     socket.on("connect", () => {
-      socket.emit("join", cookies.user, params.tableId);
+      socket.emit("join", user, params.tableId);
     });
     socket.on("table-data", (table) => {
       setFinishedHand(false);
