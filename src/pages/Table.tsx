@@ -4,8 +4,9 @@ import { io } from "socket.io-client";
 import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
 import { ITableData } from "../interface";
+import { BASE_URL_PROD } from "../config";
 
-const socket = io("http://localhost:8888", { autoConnect: false });
+const socket = io(`${BASE_URL_PROD}:8888`, { autoConnect: false });
 
 const Table = () => {
   const [cookies] = useCookies();
