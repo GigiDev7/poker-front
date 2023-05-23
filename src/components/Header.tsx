@@ -6,13 +6,14 @@ import AuthForm from "./AuthForm";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { capitalize } from "../utils/capitalize";
 import { useCookies } from "react-cookie";
-import { authAction } from "../store/auth";
+import { authAction, loginUser, registerUser } from "../store/auth";
 import authAPI from "../api/auth";
 
 const Header = () => {
   const { hideModal, isOpen, showModal } = useModal();
   const [auth, setAuth] = useState("");
   const user = useAppSelector((state) => state.auth.user);
+  const loading = useAppSelector((state) => state.auth.loading);
   const [_, _2, removeCookie] = useCookies();
   const dispatch = useAppDispatch();
 
@@ -39,14 +40,31 @@ const Header = () => {
     dispatch(authAction.setUser(null));
   };
 
+  const onGuestLogin = async () => {
+    const randNum = Math.floor(Math.random() * 10000);
+    await dispatch(
+      registerUser({
+        email: `Guest${randNum}@gmail.com`,
+        firstname: `Guest ${randNum}`,
+        lastname: ".",
+        password: "123456",
+      })
+    ).unwrap();
+    dispatch(
+      loginUser({ email: `Guest${randNum}@gmail.com`, password: "123456" })
+    );
+  };
+
   return (
     <div className="flex justify-between  font-medium w-[80%] mx-auto">
       <div className="flex gap-6 text-white">
         <Link to="/">Home</Link>
-        <Link to="/tables">Tables</Link>
       </div>
       {!user && (
         <div className="flex gap-6 text-white">
+          <button onClick={onGuestLogin}>
+            {loading ? "Logging in..." : "Continue as guest"}
+          </button>
           <button onClick={() => onBtnClick("login")}>Login</button>
           <button onClick={() => onBtnClick("register")}>Register</button>
         </div>
