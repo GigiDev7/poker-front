@@ -46,6 +46,11 @@ const GameTable: React.FC<{
     setProgressBatStatus(100);
     time.current = 30;
 
+    if (localStorage.getItem("move-timer")) {
+      time.current = +localStorage.getItem("move-timer")!;
+      setProgressBatStatus(100 - ((30 - time.current) * 100) / 30);
+    }
+
     let interval: NodeJS.Timer | null = null;
 
     if (player.id === tableData.playerTurn) {
@@ -53,8 +58,10 @@ const GameTable: React.FC<{
         time.current -= 1;
         if (time.current === 0) {
           onTimerExpire();
+          localStorage.removeItem("move-timer");
         } else {
           setProgressBatStatus((prev) => (prev -= 100 / 30));
+          localStorage.setItem("move-timer", time.current.toString());
         }
       }, 1000);
     }
@@ -62,6 +69,7 @@ const GameTable: React.FC<{
     return () => {
       if (interval) {
         clearInterval(interval);
+        localStorage.removeItem("move-timer");
       }
     };
   }, [tableData.playerTurn, finishedHand]);
