@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Player from "./Player";
 import Card from "./Card";
 import { BiCoinStack } from "react-icons/bi";
@@ -34,6 +34,40 @@ const GameTable: React.FC<{
   const [raiseChips, setRaiseChips] = useState<number | null>(null);
   const [chipsValid, setChipsValid] = useState(true);
 
+  const [progressBarStatus, setProgressBatStatus] = useState(100);
+
+  let time = useRef(30);
+
+  useEffect(() => {
+    if (finishedHand) {
+      setProgressBatStatus(0);
+      return;
+    }
+    setProgressBatStatus(100);
+    time.current = 30;
+
+    let interval: NodeJS.Timer | null = null;
+
+    if (player.id === tableData.playerTurn) {
+      interval = setInterval(() => {
+        time.current -= 1;
+        if (time.current === 0) {
+          onTimerExpire();
+        } else {
+          setProgressBatStatus((prev) => (prev -= 100 / 30));
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [tableData.playerTurn, finishedHand]);
+
+  const checkButtonRef = useRef<HTMLButtonElement>(null);
+
   const onFold = () => {
     handleAction("fold");
   };
@@ -56,6 +90,14 @@ const GameTable: React.FC<{
       handleAction("raise", raiseChips);
       setRaiseChips(null);
       setChipsValid(true);
+    }
+  };
+
+  const onTimerExpire = () => {
+    if (checkButtonRef.current?.disabled) {
+      handleAction("fold");
+    } else {
+      handleAction("check");
     }
   };
 
@@ -106,6 +148,7 @@ const GameTable: React.FC<{
           <Player
             playerData={player}
             isTurn={tableData.playerTurn === player.id}
+            progressBarStatus={progressBarStatus}
           />
         </div>
         <div className="flex flex-col items-center mr-8 absolute left-20 text-xl text-white gap-2">
@@ -121,6 +164,7 @@ const GameTable: React.FC<{
           <Player
             isTurn={tableData.playerTurn === oponent.id}
             playerData={oponent}
+            progressBarStatus={progressBarStatus}
           />
           <div className="flex gap-2 relative">
             <Card card={oponent.cards[0]} back={!finishedHand} />
@@ -146,6 +190,7 @@ const GameTable: React.FC<{
             Call
           </button>
           <button
+            ref={checkButtonRef}
             onClick={onCheck}
             disabled={
               tableData.player1.action.actionChips !==
