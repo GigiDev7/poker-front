@@ -46,13 +46,14 @@ const Table = () => {
 
   return (
     <div className="bg-black h-full flex justify-center items-center">
-      {tableData ? (
+      {tableData && (
         <GameTable
           handleAction={handleAction}
           tableData={tableData}
           finishedHand={finishedHand}
         />
-      ) : (
+      )}
+      {tableData && !tableData.player2 && (
         <p className="text-white">Waiting for another player</p>
       )}
     </div>

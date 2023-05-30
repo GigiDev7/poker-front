@@ -134,6 +134,7 @@ const GameTable: React.FC<{
 
   const closeGame = () => {
     window.close();
+    localStorage.removeItem("move-timer");
   };
 
   return (
@@ -142,8 +143,20 @@ const GameTable: React.FC<{
         <p className="tracking-[30px] pl-[25px] font-bold">WSOP</p>
         <div className="absolute -bottom-10 flex flex-col items-center gap-4">
           <div className="flex gap-2 relative">
-            <Card card={player.cards[0]} />
-            <Card card={player.cards[1]} />
+            <Card
+              card={player.cards[0]}
+              combinationCard={
+                finishedHand &&
+                player.combination.cards.includes(player.cards[0])
+              }
+            />
+            <Card
+              card={player.cards[1]}
+              combinationCard={
+                finishedHand &&
+                player.combination.cards.includes(player.cards[1])
+              }
+            />
             {player.action.actionChips > 0 && (
               <div className="absolute -bottom-10 -left-8 text-white gap-1 flex items-center">
                 <p>{player.action.actionChips}</p>
@@ -165,7 +178,13 @@ const GameTable: React.FC<{
         </div>
         <div className="flex gap-2 absolute">
           {tableData.cards.map((c) => (
-            <Card key={c} card={c} />
+            <Card
+              key={c}
+              card={c}
+              combinationCard={
+                finishedHand && player.combination.cards.includes(c)
+              }
+            />
           ))}
         </div>
         <div className="absolute -top-10 flex flex-col items-center gap-4">
@@ -188,6 +207,13 @@ const GameTable: React.FC<{
           </div>
         </div>
       </div>
+      {finishedHand && (
+        <div className="mt-16 bg-white rounded-md flex justify-between items-center">
+          <p className="m-5 text-center font-semibold">
+            {player.combination.combination}
+          </p>
+        </div>
+      )}
       {tableData.playerTurn === player.id && !finishedHand && (
         <div className="mt-16 bg-white h-20 rounded-md flex justify-between items-center px-5">
           <button

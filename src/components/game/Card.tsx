@@ -6,7 +6,11 @@ import {
   BsFillSuitSpadeFill,
 } from "react-icons/bs";
 
-const Card: React.FC<{ card: string; back?: boolean }> = ({ card, back }) => {
+const Card: React.FC<{
+  card: string;
+  back?: boolean;
+  combinationCard?: boolean;
+}> = ({ card, back, combinationCard }) => {
   const suits = {
     C: (
       <p className="">
@@ -37,7 +41,11 @@ const Card: React.FC<{ card: string; back?: boolean }> = ({ card, back }) => {
   ) as keyof typeof suits;
 
   return (
-    <div className="relative bg-white w-14 h-20 rounded-md flex flex-col px-1 font-medium  justify-between">
+    <div
+      className={`relative bg-white w-14 h-20 rounded-md flex flex-col px-1 font-medium  justify-between ${
+        combinationCard && "border-2 border-yellow-600 scale-125"
+      }`}
+    >
       {!back && (
         <>
           <div className="text-sm text-center w-fit">
